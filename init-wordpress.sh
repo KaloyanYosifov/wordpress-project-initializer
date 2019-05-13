@@ -1,3 +1,5 @@
+#! /bin/bash
+
 checkIfbinaryExists()
 {
     # $1 is the binary we are looking for
@@ -11,7 +13,7 @@ checkIfbinaryExists()
     fi
 }
 # check the wp binary
-checkIfbinaryExists wp "Please install wp-cli!"
+checkIfbinaryExists wp-cli "Please install wp-cli!"
 
 # check mysql binary
 checkIfbinaryExists mysql "Please install mysql!"
@@ -25,7 +27,7 @@ fi
 # declare whitelisted parameters
 whitelistParamters=( "d" "u" "p" )
 # declare the parameters array
-declare -A parameters
+parameters=()
 
 # loop to get all options
 while getopts ":d:u:p" option; do
@@ -40,12 +42,13 @@ while getopts ":d:u:p" option; do
     done
     
     if [ $optionFound -eq 1 ]; then
-        parameters[$option]=$OPTARG
-        echo ${parameters["u"]}
+        parameters["${option}ewrwer"]=$OPTARG
     fi
 done
 
-echo $parameters
+for param in ${parameters[@]}; do
+    echo $param
+done
 
 # # loop through all parameters
 # for parameter in $*
