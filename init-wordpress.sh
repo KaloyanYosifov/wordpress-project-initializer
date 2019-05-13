@@ -10,8 +10,6 @@ checkIfbinaryExists()
         exit 1
     fi
 }
-usage() { echo "Usage: $0 [-s <45|90>] [-p <string>]" 1>&2; exit 1; }
-
 # check the wp binary
 checkIfbinaryExists wp "Please install wp-cli!"
 
@@ -24,13 +22,30 @@ if [ $# -lt 1 ]; then
     exit 1
 fi
 
+# declare whitelisted parameters
+whitelistParamters=( "d" "u" "p" )
 # declare the parameters array
-declare -a paramtersArray
+declare -A parameters
 
-while getopts ":d:" option
-do
-    echo $option ${OPTARG}
+# loop to get all options
+while getopts ":d:u:p" option; do
+    # default to 0
+    optionFound=0
+    
+    for whitelistedParameter in ${whitelistParamters[@]}; do
+        if [ "$option" == "$whitelistedParameter" ]; then
+            # set to 1 (or true in most programming languages)
+            optionFound=1
+        fi
+    done
+    
+    if [ $optionFound -eq 1 ]; then
+        parameters[$option]=$OPTARG
+        echo ${parameters["u"]}
+    fi
 done
+
+echo $parameters
 
 # # loop through all parameters
 # for parameter in $*
