@@ -37,19 +37,28 @@ fi
 checkIfbinaryExists mysql "Please install mysql!" true
 
 # check if we have arguments less than 0
-if [ $# -lt 1 ]; then
+if [ $# -lt 2 ]; then
     echo "Please enter at least (-p) the path parameter. With the path you want your project to be installed in!"
+    exit 1
+fi
+
+# check if the number of arguments is event
+if [ $(($# % 2)) -ne 0 ]; then
+    echo "You have passed uneven arguments. Please do check if after an argument you have secified a value like (-p test)"
     exit 1
 fi
 
 # loop through all passed arguments for the script
 # and add them to array
 
-whitelistedArgumentsArray=("-p" "--user" "--password")
+whitelistedArgumentsArray=("-p" "-v" "--user" "--password")
+
+mysqlOptions=""
+wpCliOptions="core download"
 
 # loop throught script's arguments
-for argument in $#; do
-    argumentFound=false
+while [ "$#" -gt 0 ]; do
+    argumentWhitelisted=false
     
     # loop throught whitelisted array
     for whitelistedArgument in ${whitelistedArgumentsArray[@]}; do
@@ -58,16 +67,41 @@ for argument in $#; do
         # if it is true we set the argument found to true
         # and break from the loop
         if [ $whitelistedArgument == $1 ]; then
-            argumentFound=true
+            argumentWhitelisted=true
             break
         fi
-        
     done
     
     
-    if [ $argumentFound = true ]; then
-        echo $1
+    # if argument is whitelisted
+    # append to options array
+    if [ $argumentWhitelisted = true ]; then
+        # path to project so we append to wp cli options the path to create project
+        if [ $1 == "-p" ]; then
+            wpCliOptions="$wpCliOptions --path=$2"
+            
+            # check if directory exists
+            # if not create the directory
+            if [ -d $2 ]; then
+                mkdir $2
+            fi
+        fi
+        
+        if [ $1 == "-v" ]; then
+            if ! [[ $2 == [[:digit:]]\.[[:digit:]]\.[[:digit:]] ]]; then
+                echo "Please enter a valid wordpress version like (5.0.1)"
+                exit 1
+            fi
+            
+            wpCliOptions="$wpCliOptions --version=$2"
+        fi
+        
+        # remove the second argument from the main script argument array
+        shift
     fi
     
+    # remove the argument from the main script argument array
     shift
 done
+
+$wpCliBinaryToUse $wpCliOptions
