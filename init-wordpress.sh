@@ -13,43 +13,34 @@ checkIfbinaryExists()
     fi
 }
 # check the wp binary
-checkIfbinaryExists wp-cli "Please install wp-cli!"
+checkIfbinaryExists wp "Please install wp-cli!"
 
 # check mysql binary
 checkIfbinaryExists mysql "Please install mysql!"
 
 # check if we have arguments less than 0
 if [ $# -lt 1 ]; then
-    echo "Please enter at least (-d) the directory parameter. With the path you want your project to be installed in!"
+    echo "Please enter at least (-p) the path parameter. With the path you want your project to be installed in!"
     exit 1
 fi
 
-# declare whitelisted parameters
-whitelistParamters=( "d" "u" "p" )
-# declare the parameters array
-parameters=()
-
-# loop to get all options
-while getopts ":d:u:p" option; do
-    # default to 0
-    optionFound=0
-    
-    for whitelistedParameter in ${whitelistParamters[@]}; do
-        if [ "$option" == "$whitelistedParameter" ]; then
-            # set to 1 (or true in most programming languages)
-            optionFound=1
+while [ "$#" -gt 0 ]; do
+    #1 is the first parameter
+    if [ "$1" = "-p" ]; then
+        # we get the directory path
+        path=$2
+        
+        if ! [ -d $path ]; then
+            mkdir $path
         fi
-    done
-    
-    if [ $optionFound -eq 1 ]; then
-        parameters["${option}ewrwer"]=$OPTARG
+        
+        # remove argument
+        shift
+    else
+        # remove the parameter from the argument $[0......]
+        shift
     fi
 done
-
-for param in ${parameters[@]}; do
-    echo $param
-done
-
 # # loop through all parameters
 # for parameter in $*
 # do
