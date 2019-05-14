@@ -41,8 +41,33 @@ if [ $# -lt 1 ]; then
     echo "Please enter at least (-p) the path parameter. With the path you want your project to be installed in!"
     exit 1
 fi
-# # loop through all parameters
-# for parameter in $*
-# do
 
-# done
+# loop through all passed arguments for the script
+# and add them to array
+
+whitelistedArgumentsArray=("-p" "--user" "--password")
+
+# loop throught script's arguments
+for argument in $#; do
+    argumentFound=false
+    
+    # loop throught whitelisted array
+    for whitelistedArgument in ${whitelistedArgumentsArray[@]}; do
+        
+        # compare the whitelisted argument with the actual argument
+        # if it is true we set the argument found to true
+        # and break from the loop
+        if [ $whitelistedArgument == $1 ]; then
+            argumentFound=true
+            break
+        fi
+        
+    done
+    
+    
+    if [ $argumentFound = true ]; then
+        echo $1
+    fi
+    
+    shift
+done
