@@ -8,39 +8,39 @@ checkIfbinaryExists()
     # get the binary location
     # and send the errors (2>) to null
     if [ -z $(which $1 2> /dev/null) ]; then
-        echo "$2"
-        exit 1
+        
+        # third parameter is to if we should print and exit the script
+        if ! [ -z $3 ] && [ $3 = true ]; then
+            echo "$2"
+            exit 1
+        fi
+        
+        return 1
     fi
 }
 # check the wp binary
-checkIfbinaryExists wp "Please install wp-cli!"
+wpCliBinaryToUse="wp"
+checkIfbinaryExists $wpCliBinaryToUse "Please install wp-cli!"
+
+# if the status code is equal to 1
+# then we did not find the binary
+# and we check for wp-cli
+if [ $? -eq 1 ]; then
+    checkIfbinaryExists wp-cli "Please install wp-cli!" true
+    
+    # we set the default binary to be wp-cli
+    # since if we didnt find that the function would have exited the script
+    wpCliBinaryToUse="wp-cli"
+fi
 
 # check mysql binary
-checkIfbinaryExists mysql "Please install mysql!"
+checkIfbinaryExists mysql "Please install mysql!" true
 
 # check if we have arguments less than 0
 if [ $# -lt 1 ]; then
     echo "Please enter at least (-p) the path parameter. With the path you want your project to be installed in!"
     exit 1
 fi
-
-while [ "$#" -gt 0 ]; do
-    #1 is the first parameter
-    if [ "$1" = "-p" ]; then
-        # we get the directory path
-        path=$2
-        
-        if ! [ -d $path ]; then
-            mkdir $path
-        fi
-        
-        # remove argument
-        shift
-    else
-        # remove the parameter from the argument $[0......]
-        shift
-    fi
-done
 # # loop through all parameters
 # for parameter in $*
 # do
