@@ -42,8 +42,9 @@ if [ $# -lt 2 ]; then
     exit 1
 fi
 
-# check if the number of arguments is event
-if [ $(($# % 2)) -ne 0 ]; then
+# check if the number of arguments is even
+# and if it is less than four arguments
+if [ $# -lt 4 ] && [ $(($# % 2)) -ne 0 ]; then
     echo "You have passed uneven arguments. Please do check if after an argument you have secified a value like (-p test)"
     exit 1
 fi
@@ -51,10 +52,17 @@ fi
 # loop through all passed arguments for the script
 # and add them to array
 
-whitelistedArgumentsArray=("-p" "-v" "--user" "--password")
+whitelistedArgumentsArray=("-p" "-v" "-u" "-ps" "-d")
+
+# create a variable to check if the whitelist argument is present
+pathArgumentPresent=false
 
 mysqlOptions=""
 wpCliOptions="core download"
+
+mysqlUser=""
+mysqlPassword=""
+mysqlDatabase=""
 
 # loop throught script's arguments
 while [ "$#" -gt 0 ]; do
@@ -78,22 +86,32 @@ while [ "$#" -gt 0 ]; do
     if [ $argumentWhitelisted = true ]; then
         # path to project so we append to wp cli options the path to create project
         if [ $1 == "-p" ]; then
+            # set the path argument preset to true
+            pathArgumentPresent=true
+            
             wpCliOptions="$wpCliOptions --path=$2"
             
             # check if directory exists
             # if not create the directory
             if [ -d $2 ]; then
                 mkdir $2
-            fi
-        fi
-        
-        if [ $1 == "-v" ]; then
+            fi;    
+        elif [ $1 == "-v" ]; then
             if ! [[ $2 == [[:digit:]]\.[[:digit:]]\.[[:digit:]] ]]; then
                 echo "Please enter a valid wordpress version like (5.0.1)"
                 exit 1
             fi
             
             wpCliOptions="$wpCliOptions --version=$2"
+        elif [ $1 == "-u" ]; then
+            mysqlUser=$2
+            mysqlOptions="$mysqlOptions -u$2"
+        elif [ $1 == "-ps" ]; then
+        echo $1
+            mysqlPassword=$2
+            mysqlOptions="$mysqlOptions -p$2"
+        elif [ $1 == "-d" ]; then
+            mysqlDatabase=$2
         fi
         
         # remove the second argument from the main script argument array
@@ -104,4 +122,17 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
+# check if we had path argument
+if [ $pathArgumentPresent = false ]; then
+    echo "Cannot build command as path argument isn't present"
+    exit 1
+fi
+
 $wpCliBinaryToUse $wpCliOptions
+
+mysqlDatabaseCreationCommand="-e 'CREATE DATABASE $mysqlDatabase;'"
+
+echo "Creating Database"
+
+mysql $mysqlOptions $mysqlDatabaseCreationCommand
+echo "Finished creating database"
