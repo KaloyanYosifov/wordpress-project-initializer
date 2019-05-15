@@ -57,7 +57,7 @@ whitelistedArgumentsArray=("-p" "-v" "-u" "-ps" "-d")
 # create a variable to check if the whitelist argument is present
 pathArgumentPresent=false
 
-mysqlOptions=""
+mysqlOptions="mysql"
 wpCliOptions="core download"
 
 mysqlUser=""
@@ -130,9 +130,7 @@ fi
 
 $wpCliBinaryToUse $wpCliOptions
 
-mysqlDatabaseCreationCommand="-e 'CREATE DATABASE $mysqlDatabase;'"
-
 echo "Creating Database"
-
-mysql $mysqlOptions $mysqlDatabaseCreationCommand
+# send the output to the void
+$mysqlOptions -e "CREATE DATABASE $mysqlDatabase" > /dev/null
 echo "Finished creating database"
