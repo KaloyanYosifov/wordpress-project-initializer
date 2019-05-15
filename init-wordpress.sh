@@ -154,6 +154,6 @@ echo Configuring wp-config
 sed -i '' "s/database_name_here/$mysqlDatabase/g" $wpConfigPath
 sed -i '' "s/password_here/$mysqlPassword/g" $wpConfigPath
 sed -i '' "s/username_here/$mysqlUser/g" $wpConfigPath
-sed -i '' "s/WP_DEBUG/true/g" $wpConfigPath
+sed -i '' "s/'WP_DEBUG', false/'WP_DEBUG', true/g" $wpConfigPath
 
 echo Finished configuring
