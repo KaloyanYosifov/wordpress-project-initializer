@@ -59,10 +59,12 @@ pathArgumentPresent=false
 
 mysqlOptions="mysql"
 wpCliOptions="core download"
+wordpressPath=""
 
 mysqlUser=""
 mysqlPassword=""
 mysqlDatabase=""
+
 
 # loop throught script's arguments
 while [ "$#" -gt 0 ]; do
@@ -90,6 +92,9 @@ while [ "$#" -gt 0 ]; do
             pathArgumentPresent=true
             
             wpCliOptions="$wpCliOptions --path=$2"
+
+            # set the wordpress path 
+            wordpressPath=$2
             
             # check if directory exists
             # if not create the directory
@@ -107,7 +112,6 @@ while [ "$#" -gt 0 ]; do
             mysqlUser=$2
             mysqlOptions="$mysqlOptions -u$2"
         elif [ $1 == "-ps" ]; then
-        echo $1
             mysqlPassword=$2
             mysqlOptions="$mysqlOptions -p$2"
         elif [ $1 == "-d" ]; then
@@ -134,3 +138,22 @@ echo "Creating Database"
 # send the output to the void
 $mysqlOptions -e "CREATE DATABASE $mysqlDatabase" > /dev/null
 echo "Finished creating database"
+
+wpConfigPath=$wordpressPath/wp-config.php
+# copy wp-config
+cp $wordpressPath/wp-config-sample.php $wpConfigPath
+
+# set the environments for wp-config
+# sed command for replacing strings
+# -i is the bak file we are going to use -- we set it empty as we do not need a backup it is also used to set the file's contents
+# the replacement strings 
+# the path
+
+echo Configuring wp-config
+
+sed -i '' "s/database_name_here/$mysqlDatabase/g" $wpConfigPath
+sed -i '' "s/password_here/$mysqlPassword/g" $wpConfigPath
+sed -i '' "s/username_here/$mysqlUser/g" $wpConfigPath
+sed -i '' "s/WP_DEBUG/true/g" $wpConfigPath
+
+echo Finished configuring
