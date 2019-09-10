@@ -18,6 +18,22 @@ checkIfbinaryExists()
         return 1
     fi
 }
+
+# print help menu and exit the program
+printHelp() {
+    # set the color of the text
+    echo -e '\E[33m'
+    echo "Minimal requirements to use the shell is to pass a path with (-p {path})"
+    echo "Other options:"
+    echo "-v {version}- [set the version of the wordpress to be installed in the path]"
+    echo "-u {name}- [set the database user]"
+    echo "-ps {password}- [set the database password]"
+    echo "-d {name}- [set the database name to be created]"
+    # reset color, so we do not break terminal
+    echo -e '\E[0m'
+    exit 0
+}
+
 # check the wp binary
 wpCliBinaryToUse="wp"
 checkIfbinaryExists $wpCliBinaryToUse "Please install wp-cli!"
@@ -35,6 +51,11 @@ fi
 
 # check mysql binary
 checkIfbinaryExists mysql "Please install mysql!" true
+
+# check if the first argument is help
+if [ $1 == "-h" ] || [ $1 == "--help" ]; then
+    printHelp
+fi
 
 # check if we have arguments less than 0
 if [ $# -lt 2 ]; then
@@ -116,6 +137,8 @@ while [ "$#" -gt 0 ]; do
             mysqlOptions="$mysqlOptions -p$2"
         elif [ $1 == "-d" ]; then
             mysqlDatabase=$2
+        elif [ $1 == "-h" ] || [ $1 == "--help" ]; then 
+            printHelp
         fi
         
         # remove the second argument from the main script argument array
