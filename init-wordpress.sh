@@ -29,6 +29,7 @@ printHelp() {
     echo "-u {name}- [set the database user]"
     echo "-ps {password}- [set the database password]"
     echo "-d {name}- [set the database name to be created]"
+    echo "Example: init-wordpress.sh -p /home/test-project -v 4.9.9 -u dbuser -ps dbpass -d db"
     # reset color, so we do not break terminal
     echo -e '\E[0m'
     exit 0
